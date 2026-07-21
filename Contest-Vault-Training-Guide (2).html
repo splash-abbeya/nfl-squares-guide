@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contest Vault — Training Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     COLOR SYSTEM — replace these 4 values with your brand colors.
+     Everything else below references these, so a 4-value swap
+     re-themes the entire guide.
+     ============================================================ */
+  :root{
+    --accent:#4BEBE2;        /* Splash Turquoise Blue */
+    --accent-deep:#0B726C;   /* darkened turquoise, for readable text/links/numbers on white */
+    --accent-tint:#E8FBFA;   /* light turquoise tint, for card/badge backgrounds */
+    --secondary:#BE6AFA;     /* Splash Heliotrope — used for color-block variety */
+    --secondary-deep:#6B21A8;/* darkened purple, for readable text on white */
+    --black:#1B1C1E;         /* Splash "Shark" — brand ink color */
+
+    /* aliases used throughout the component CSS below — leave these as-is */
+    --ink:var(--black);
+    --muted:#6B6B6B;
+    --line:#E4E4E4;
+    --line-strong:#CFCFCF;
+    --panel:#F5F5F5;
+    --white:#FFFFFF;
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--white); color:var(--ink); font-family:'Inter', sans-serif; -webkit-font-smoothing:antialiased; }
+  h1,h2,h3{ font-family:'Oswald', sans-serif; letter-spacing:0.02em; }
+  a{ color:var(--accent-deep); }
+
+  /* ---------- Sticky header: eyebrow / title / tagline / key stats ---------- */
+  .scoreboard{ position:sticky; top:0; z-index:50; background:var(--white); border-bottom:1px solid var(--line); padding:20px 32px 16px; }
+  .scoreboard-top{ display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:16px; max-width:1080px; margin:0 auto; }
+  .brand-eyebrow{ font-size:12px; letter-spacing:0.18em; text-transform:uppercase; color:var(--accent-deep); margin:0 0 6px; font-weight:600; }
+  .brand-title{ font-size:30px; font-weight:600; margin:0; color:var(--ink); }
+  .brand-sub{ font-size:13px; color:var(--muted); margin:4px 0 0; }
+  .stat-strip{ display:flex; gap:22px; }
+  .stat{ text-align:right; }
+  .stat-num{ font-family:'Oswald',sans-serif; font-size:22px; font-weight:600; color:var(--black); line-height:1; }
+  .stat-label{ font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-top:4px; }
+
+  /* ---------- Progress bar + single-row scrollable tabs ---------- */
+  .rail{ max-width:1080px; margin:18px auto 0; }
+  .progress-track{ height:3px; background:var(--line); border-radius:2px; overflow:hidden; margin-bottom:14px; }
+  .progress-fill{ height:100%; width:0%; background:var(--black); transition:width .4s ease; }
+  .tabs{ display:flex; gap:6px; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:2px; scrollbar-width:none; }
+  .tabs::-webkit-scrollbar{ display:none; }
+  .tab{ flex:0 0 auto; display:flex; align-items:center; gap:6px; white-space:nowrap; background:var(--white); border:1px solid var(--line); border-radius:20px; padding:7px 13px; cursor:pointer; color:var(--muted); font-family:'Inter',sans-serif; font-size:12px; transition:all .18s ease; }
+  .tab .tab-num{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--accent-deep); }
+  .tab.active{ background:var(--accent-tint); border-color:var(--accent-deep); color:var(--black); }
+  .tab.active .tab-num{ color:var(--accent-deep); }
+  .tab:hover:not(.active){ border-color:var(--line-strong); color:var(--ink); }
+  .tab-check{ color:var(--accent-deep); font-weight:600; opacity:0; transition:opacity .2s; }
+  .tab.visited .tab-check{ opacity:1; }
+
+  /* ---------- Main content + panels ---------- */
+  main{ max-width:1080px; margin:0 auto; padding:36px 32px 80px; }
+  .panel{ display:none; animation:fade .35s ease; }
+  .panel.active{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+  .section-head{ display:flex; align-items:baseline; gap:12px; margin:0 0 6px; }
+  .section-num{ font-family:'JetBrains Mono',monospace; color:var(--accent-deep); font-size:13px; }
+  .section-title{ font-size:24px; font-weight:600; margin:0; }
+  .section-intro{ color:var(--muted); font-size:14.5px; line-height:1.65; max-width:680px; margin:0 0 34px; }
+
+  /* h3 section headings get a divider line above them, except the first one in a panel */
+  h3.block-title{ font-size:15px; font-weight:600; color:var(--ink); margin:44px 0 16px; letter-spacing:0.03em; text-transform:uppercase; }
+  h3.block-title:not(:first-of-type){ border-top:1px solid var(--line); padding-top:28px; }
+
+  /* ---------- Component: simple 4-up label cards (e.g. pillars/principles) ---------- */
+  .pillars{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:40px; }
+  .pillar{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
+  .pillar-name{ font-family:'Oswald',sans-serif; font-size:14px; font-weight:600; color:var(--black); margin:0 0 6px; }
+  .pillar-text{ font-size:12.5px; color:var(--muted); line-height:1.5; margin:0; }
+
+  /* ---------- Component: flip cards (front label, click to flip and reveal detail) ---------- */
+  .value-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:40px; }
+  .flip-card{ perspective:1000px; height:132px; cursor:pointer; }
+  .flip-inner{ position:relative; width:100%; height:100%; transition:transform .5s; transform-style:preserve-3d; }
+  .flip-card.flipped .flip-inner{ transform:rotateY(180deg); }
+  .flip-face{ position:absolute; inset:0; backface-visibility:hidden; border-radius:10px; padding:16px; border:1px solid var(--line); }
+  .flip-front{ background:var(--white); display:flex; flex-direction:column; justify-content:space-between; }
+  .flip-back{ background:var(--accent); border-color:var(--accent); transform:rotateY(180deg); display:flex; align-items:center; }
+  .flip-front .tag{ font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--accent-deep); text-transform:uppercase; letter-spacing:.06em; }
+  .flip-front .vname{ font-family:'Oswald',sans-serif; font-size:16px; font-weight:600; color:var(--ink); }
+  .flip-hint{ font-size:10px; color:var(--muted); }
+  .flip-back p{ font-size:12.5px; line-height:1.55; color:var(--black); margin:0; }
+
+  /* ---------- Component: stage/step selector (e.g. a journey or process) ---------- */
+  .journey{ display:flex; gap:8px; margin-bottom:8px; flex-wrap:wrap; }
+  .journey-stage{ flex:1; min-width:130px; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px 14px; cursor:pointer; }
+  .journey-stage.active{ border-color:var(--accent); background:var(--accent-tint); }
+  .journey-stage .jnum{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--accent-deep); }
+  .journey-stage .jname{ font-size:13px; font-weight:600; margin-top:4px; color:var(--ink); }
+  .journey-detail{ background:var(--accent); border:1px solid var(--accent); border-left:3px solid var(--black); border-radius:0 8px 8px 0; padding:16px 18px; margin:10px 0 40px; font-size:13px; color:var(--black); line-height:1.6; }
+  .journey-detail ul{ margin:6px 0 0; padding-left:18px; }
+
+  /* ---------- Component: KPI / stat scoreboard cards ---------- */
+  .standards-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
+  .std-card{ background:var(--accent-deep); border:1px solid var(--accent-deep); border-radius:10px; padding:14px 16px; text-align:center; }
+  .std-card:nth-child(2){ background:var(--secondary-deep); border-color:var(--secondary-deep); }
+  .std-card:nth-child(3){ background:var(--black); border-color:var(--black); }
+  .std-card:nth-child(4){ background:var(--accent-deep); border-color:var(--accent-deep); }
+  .std-num{ font-family:'Oswald',sans-serif; font-size:26px; font-weight:600; color:var(--white); }
+  .std-label{ font-size:10.5px; color:rgba(255,255,255,.75); margin-top:4px; text-transform:uppercase; letter-spacing:.04em; }
+
+  /* ---------- Component: clickable horizontal bar chart (relative values, no exact numbers needed) ---------- */
+  .bar-row{ margin-bottom:12px; cursor:pointer; }
+  .bar-row-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px; }
+  .bar-topic{ font-size:13px; font-weight:600; color:var(--ink); }
+  .bar-track{ height:8px; background:var(--panel); border-radius:4px; overflow:hidden; }
+  .bar-fill{ height:100%; background:var(--accent-deep); border-radius:4px; }
+  .bar-detail{ display:none; background:var(--panel); border-left:3px solid var(--accent-deep); border-radius:0 8px 8px 0; padding:12px 16px; margin:8px 0 4px; font-size:12px; color:var(--muted); line-height:1.6; }
+  .bar-row.open .bar-detail{ display:block; }
+
+  /* ---------- Component: 2-column before/after or comparison table ---------- */
+  .compare-table{ border:1px solid var(--line); border-radius:10px; overflow:hidden; margin-bottom:18px; }
+  .compare-row{ display:grid; grid-template-columns:1fr 34px 1fr; align-items:stretch; }
+  .compare-row + .compare-row{ border-top:1px solid var(--line); }
+  .compare-cell{ padding:12px 16px; font-size:12.5px; line-height:1.5; }
+  .compare-cell.before{ color:var(--muted); background:var(--white); }
+  .compare-cell.after{ color:var(--white); background:var(--secondary-deep); font-weight:500; }
+  .compare-arrow{ display:flex; align-items:center; justify-content:center; background:var(--black); color:var(--white); font-size:15px; font-weight:600; }
+  .compare-head{ display:grid; grid-template-columns:1fr 34px 1fr; background:var(--black); }
+  .compare-head span{ padding:10px 16px; font-family:'JetBrains Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--white); }
+  .compare-head .compare-arrow{ background:var(--black); }
+
+  /* ---------- Component: 3-column status table (standard / current state / status pill) ---------- */
+  .status-table{ border:1px solid var(--line); border-radius:10px; overflow:hidden; margin-bottom:18px; }
+  .status-head{ display:grid; grid-template-columns:1.1fr 1.6fr 110px; background:var(--black); }
+  .status-head span{ padding:10px 14px; font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--white); }
+  .status-row{ display:grid; grid-template-columns:1.1fr 1.6fr 110px; align-items:center; }
+  .status-row + .status-row{ border-top:1px solid var(--line); }
+  .status-cell{ padding:12px 14px; font-size:12.5px; line-height:1.5; }
+  .status-cell.label{ color:var(--ink); font-weight:500; }
+  .status-cell.desc{ color:var(--muted); }
+  .status-pill{ display:inline-block; padding:4px 10px; border-radius:12px; font-size:10.5px; font-weight:600; white-space:nowrap; }
+  .status-pill.good{ background:var(--accent-deep); color:var(--white); }
+  .status-pill.pending{ background:var(--panel); color:var(--muted); border:1px solid var(--line-strong); }
+
+  /* ---------- Component: tap-to-expand cards (e.g. roster/roles — short teaser, click for full detail) ---------- */
+  .expand-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:14px; margin-bottom:38px; }
+  .expand-card{ background:var(--white); border:1px solid var(--line); border-radius:10px; padding:16px; cursor:pointer; }
+  .expand-card-top{ display:flex; justify-content:space-between; align-items:flex-start; }
+  .badge{ display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; background:var(--accent-deep); border:none; color:var(--white); font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; margin-bottom:10px; }
+  .badge-sm{ display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; width:26px; height:26px; border-radius:50%; background:var(--secondary); border:none; color:var(--white); font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; }
+  .expand-arrow{ color:var(--muted); font-size:11px; transition:transform .2s; margin-top:6px; }
+  .expand-card.open .expand-arrow{ transform:rotate(180deg); }
+  .expand-name{ font-size:14.5px; font-weight:600; margin:0 0 4px; color:var(--ink); }
+  .expand-teaser{ font-size:12.5px; color:var(--muted); line-height:1.55; margin:0 0 10px; }
+  .expand-full{ max-height:0; overflow:hidden; transition:max-height .3s ease; }
+  .expand-card.open .expand-full{ max-height:400px; }
+  .expand-full-inner{ font-size:12.5px; color:var(--muted); line-height:1.6; padding-bottom:10px; }
+  .expand-full-inner b{ color:var(--ink); }
+  .expand-tag{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--accent-deep); background:var(--accent-tint); display:inline-block; padding:3px 8px; border-radius:5px; }
+
+  /* ---------- Component: segmented selector (click an option, see the matching result below) ---------- */
+  .selector-wrap{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:20px; margin-bottom:40px; }
+  .selector-buttons{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .selector-btn{ background:var(--white); border:1px solid var(--line); color:var(--muted); font-size:12.5px; padding:8px 14px; border-radius:20px; cursor:pointer; font-family:'Inter',sans-serif; }
+  .selector-btn.active{ background:var(--black); border-color:var(--black); color:var(--white); }
+  .selector-result{ font-size:13px; color:var(--muted); line-height:1.6; border-top:1px solid var(--line); padding-top:14px; }
+  .selector-result b{ color:var(--ink); }
+
+  /* ---------- Component: banner callouts. Use "strong" for the one critical rule, "soft" for informational ones ---------- */
+  .banner{ border-radius:10px; padding:18px 20px; margin-bottom:20px; border:1px solid; }
+  .banner.strong{ background:var(--black); border-color:var(--black); }
+  .banner.soft{ background:var(--accent); border-color:var(--accent); }
+  .banner .b-eyebrow{ font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px; }
+  .banner.strong .b-eyebrow{ color:var(--accent); }
+  .banner.soft .b-eyebrow{ color:var(--black); opacity:.6; }
+  .banner p{ font-size:14.5px; font-weight:500; margin:0; color:var(--ink); line-height:1.55; }
+  .banner.strong p{ color:var(--white); }
+
+  /* ---------- Component: accordion (click to expand — use for lists of principles/tips/skills) ---------- */
+  .accordion-item{ border:1px solid var(--line); border-radius:8px; margin-bottom:8px; overflow:hidden; background:var(--white); }
+  .accordion-head{ display:flex; align-items:center; justify-content:space-between; padding:13px 16px; cursor:pointer; }
+  .accordion-head .ah-left{ display:flex; align-items:center; gap:10px; }
+  .accordion-title{ font-size:13.5px; font-weight:500; color:var(--ink); }
+  .accordion-arrow{ color:var(--muted); font-size:11px; transition:transform .2s; }
+  .accordion-item.open .accordion-arrow{ transform:rotate(180deg); }
+  .accordion-body{ max-height:0; overflow:hidden; transition:max-height .3s ease; }
+  .accordion-item.open .accordion-body{ max-height:300px; }
+  .accordion-body-inner{ padding:0 16px 16px 16px; font-size:12.5px; color:var(--muted); line-height:1.6; }
+
+  /* ---------- Component: small tag/badge grid (e.g. channel or contact directory) ---------- */
+  .tag-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:36px; }
+  .tag-card{ background:var(--white); border:1px solid var(--line); border-radius:8px; padding:12px 14px; display:flex; gap:12px; align-items:flex-start; }
+  .tag-name{ font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--white); background:var(--secondary-deep); padding:4px 8px; border-radius:5px; white-space:nowrap; flex-shrink:0; }
+  .tag-desc{ font-size:12px; color:var(--muted); line-height:1.5; }
+  .fine-print{ font-size:11.5px; color:var(--muted); font-style:italic; margin:0 0 30px; }
+
+  /* ---------- Component: format chips (e.g. list of available/upcoming formats) ---------- */
+  .format-group{ margin-bottom:18px; }
+  .format-group-label{ font-family:'JetBrains Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 10px; }
+  .format-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .format-chip{ font-size:12.5px; font-weight:500; padding:7px 14px; border-radius:20px; background:var(--accent-deep); color:var(--white); }
+  .format-chip.soon{ background:var(--white); color:var(--muted); border:1px solid var(--line-strong); }
+
+  /* ---------- Component: resource/source link list ---------- */
+  .resource-list{ list-style:none; padding:0; margin:0 0 10px; }
+  .resource-list li{ border:1px solid var(--line); border-radius:8px; padding:12px 16px; margin-bottom:8px; }
+  .resource-list a{ font-size:13.5px; font-weight:500; text-decoration:none; }
+  .resource-list a:hover{ text-decoration:underline; }
+  .resource-list p{ font-size:12px; color:var(--muted); margin:4px 0 0; }
+
+  footer{ border-top:1px solid var(--line); padding:26px 32px; max-width:1080px; margin:0 auto; }
+  .foot-grid{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px; font-size:12.5px; color:var(--muted); }
+  .foot-grid a{ color:var(--muted); text-decoration:none; border-bottom:1px dotted var(--muted); }
+  .foot-grid a:hover{ color:var(--accent-deep); border-color:var(--accent-deep); }
+
+  @media (max-width:760px){
+    .stat-strip{ display:none; }
+    .pillars, .value-grid, .expand-grid, .tag-grid{ grid-template-columns:repeat(1,1fr); }
+    .standards-grid{ grid-template-columns:repeat(2,1fr); }
+    .journey{ flex-direction:column; }
+    .status-head, .status-row{ grid-template-columns:1fr; }
+    .compare-head, .compare-row{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scoreboard">
+  <div class="scoreboard-top">
+    <div>
+      <p class="brand-eyebrow">Splash · Contest Vault</p>
+      <h1 class="brand-title">Contest Vault: Training Guide</h1>
+      <p class="brand-sub">How commissioners securely collect, hold, and pay out entry fees through our LeagueSafe integration.</p>
+    </div>
+    <div class="stat-strip">
+      <div class="stat"><div class="stat-num">3%</div><div class="stat-label">Processing fee</div></div>
+      <div class="stat"><div class="stat-num">$0</div><div class="stat-label">Cut Splash takes</div></div>
+      <div class="stat"><div class="stat-num">51</div><div class="stat-label">States + Canada</div></div>
+    </div>
+  </div>
+
+  <div class="rail">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="tabs">
+      <button class="tab active" data-panel="0"><span class="tab-num">Part 1</span>How It Works<span class="tab-check">✓</span></button>
+      <button class="tab" data-panel="1"><span class="tab-num">Part 2</span>Roles & Rules<span class="tab-check">✓</span></button>
+      <button class="tab" data-panel="2"><span class="tab-num">Part 3</span>Voting & Payouts<span class="tab-check">✓</span></button>
+      <button class="tab" data-panel="3"><span class="tab-num">Part 4</span>FAQ<span class="tab-check">✓</span></button>
+      <button class="tab" data-panel="4"><span class="tab-num">Part 5</span>Resources<span class="tab-check">✓</span></button>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- ============ PANEL 1 — How It Works ============ -->
+  <section class="panel active" id="panel-0">
+    <div class="section-head"><span class="section-num">01</span><h2 class="section-title">How the Vault Works</h2></div>
+    <p class="section-intro">The Contest Vault lets commissioners collect entry fees without ever touching real money themselves. Here's the full flow, the fees, and what's different from a self-managed contest.</p>
+
+    <!-- 4-up label cards -->
+    <div class="pillars">
+      <div class="pillar"><p class="pillar-name">LeagueSafe Holds the Funds</p><p class="pillar-text">Splash integrates directly with LeagueSafe. Funds are never held by Splash.</p></div>
+      <div class="pillar"><p class="pillar-name">3% Processing Fee</p><p class="pillar-text">A $100 payment sends $97 into the Vault and $3 to LeagueSafe for processing.</p></div>
+      <div class="pillar"><p class="pillar-name">No Rake, No Service Fee</p><p class="pillar-text">Enabling the Vault waives the standard Self Managed Service Fee — once a payment lands.</p></div>
+      <div class="pillar"><p class="pillar-name">Available Everywhere</p><p class="pillar-text">All 50 states plus Canada. No geolocation restrictions on collecting or paying.</p></div>
+    </div>
+
+    <h3 class="block-title">Contest formats where available</h3>
+    <div class="format-group">
+      <p class="format-group-label">At launch</p>
+      <div class="format-row">
+        <span class="format-chip">NFL Survivor</span>
+        <span class="format-chip">NCAAF Survivor</span>
+        <span class="format-chip">NFL + NCAAF Survivor</span>
+        <span class="format-chip">NFL Pick'em</span>
+        <span class="format-chip">NCAAF Pick'em</span>
+        <span class="format-chip">NFL + NCAAF Pick'em</span>
+      </div>
+    </div>
+    <div class="format-group">
+      <p class="format-group-label">Coming soon</p>
+      <div class="format-row">
+        <span class="format-chip soon">NFL Squares</span>
+        <span class="format-chip soon">NFL Shares</span>
+      </div>
+    </div>
+
+    <h3 class="block-title">Payment rules at a glance — tap a card</h3>
+    <div class="value-grid" id="flipGrid"></div>
+
+    <h3 class="block-title">Money flow — select a stage</h3>
+    <div class="journey" id="stageBar"></div>
+    <div class="journey-detail" id="stageDetail"></div>
+
+    <h3 class="block-title">Fee snapshot</h3>
+    <div class="standards-grid">
+      <div class="std-card"><div class="std-num">3%</div><div class="std-label">Processing fee</div></div>
+      <div class="std-card"><div class="std-num">$97</div><div class="std-label">Of every $100, into the vault</div></div>
+      <div class="std-card"><div class="std-num">0%</div><div class="std-label">Taken by Splash</div></div>
+      <div class="std-card"><div class="std-num">51</div><div class="std-label">States + Canada covered</div></div>
+    </div>
+
+    <h3 class="block-title">Fee comparison — tap a topic</h3>
+    <div id="barChart"></div>
+
+    <h3 class="block-title">Self-managed vs. Contest Vault</h3>
+    <div class="compare-table">
+      <div class="compare-head"><span>Before</span><span class="compare-arrow">→</span><span>After</span></div>
+      <div id="compareRows"></div>
+    </div>
+
+    <div class="banner soft" style="margin-top:18px;">
+      <div class="b-eyebrow">Fee waiver note</div>
+      <p>The Self Managed Service Fee isn't waived automatically — it drops off only after at least one payment has actually landed in the Vault. Disable the Vault, and that fee comes right back. Expect stricter abuse-prevention rules around this waiver later in the year (targeted for August or the start of the season).</p>
+    </div>
+
+    <h3 class="block-title">What's supported today</h3>
+    <div class="status-table">
+      <div class="status-head"><span>Standard</span><span>Current state</span><span>Status</span></div>
+      <div id="statusRows"></div>
+    </div>
+
+    <h3 class="block-title">Things worth repeating</h3>
+    <div id="listAccordion"></div>
+  </section>
+
+  <!-- ============ PANEL 2 — Roles & Rules ============ -->
+  <section class="panel" id="panel-1">
+    <div class="section-head"><span class="section-num">02</span><h2 class="section-title">Roles & Rules</h2></div>
+    <p class="section-intro">Commissioners run the Vault with zero help from Splash. Here's who owns what, and the one rule that overrides everything else.</p>
+
+    <h3 class="block-title">Who owns what — tap a role</h3>
+    <div class="expand-grid" id="rosterGrid"></div>
+
+    <div class="banner strong">
+      <div class="b-eyebrow">The one rule that matters most</div>
+      <p>Splash cannot force funds to be paid out. Whether it's a stalled vote or an automatic-payout commissioner playing favorites, there's nothing Splash can do to override it.</p>
+    </div>
+
+    <h3 class="block-title">Approval type — pick an option</h3>
+    <div class="selector-wrap">
+      <div class="selector-buttons" id="selectorButtons"></div>
+      <div class="selector-result" id="selectorResult"></div>
+    </div>
+  </section>
+
+  <!-- ============ PANEL 3 — Voting & Payouts deep dive ============ -->
+  <section class="panel" id="panel-2">
+    <div class="section-head"><span class="section-num">03</span><h2 class="section-title">Voting & Payouts</h2></div>
+    <p class="section-intro">Voting has no deadline by design — that works fine in small contests, but it means the default needs to change depending on the format.</p>
+    <div id="secondAccordion"></div>
+  </section>
+
+  <!-- ============ PANEL 4 — FAQ highlights ============ -->
+  <section class="panel" id="panel-3">
+    <div class="section-head"><span class="section-num">04</span><h2 class="section-title">FAQ</h2></div>
+    <p class="section-intro">A handful of the questions commissioners and entrants ask most. For the full list, see the companion Contest Vault FAQ doc.</p>
+
+    <h3 class="block-title">Commissioners ask</h3>
+    <div id="faqCommAcc"></div>
+
+    <h3 class="block-title">Entrants ask</h3>
+    <div id="faqEntAcc"></div>
+  </section>
+
+  <!-- ============ PANEL 5 — always end on Resources ============ -->
+  <section class="panel" id="panel-4">
+    <div class="section-head"><span class="section-num">05</span><h2 class="section-title">Resources</h2></div>
+    <p class="section-intro">The source documents this guide is built on.</p>
+
+    <h3 class="block-title">Source documents</h3>
+    <ul class="resource-list" id="resourceList"></ul>
+  </section>
+
+</main>
+
+<footer>
+  <div class="foot-grid">
+    <span>Companion doc: Contest Vault Product Notes</span>
+    <span>Questions? #cs-support</span>
+  </div>
+</footer>
+
+<script>
+  // ---------- Tabs ----------
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  const visited = new Set([0]);
+  function showPanel(i){
+    tabs.forEach((t,idx)=>t.classList.toggle('active', idx===i));
+    panels.forEach((p,idx)=>p.classList.toggle('active', idx===i));
+    visited.add(i);
+    tabs.forEach((t,idx)=>t.classList.toggle('visited', visited.has(idx)));
+    document.getElementById('progressFill').style.width = (visited.size/tabs.length*100)+'%';
+  }
+  tabs.forEach((t,i)=>t.addEventListener('click', ()=>showPanel(i)));
+
+  // ---------- Flip cards ----------
+  const flipItems = [
+    {tag:'Paying in', name:'No KYC to Pay', text:'Users can submit entry fee payments with no KYC requirements at all. KYC only kicks in when they go to withdraw.'},
+    {tag:'Paying out', name:'KYC to Withdraw', text:'Users must complete KYC before withdrawing funds — either straight to their bank account or by transferring into their Splash wallet.'},
+    {tag:'Payment method', name:'No Wallet Balance', text:'Users can\'t pay with their Splash wallet balance — and LeagueSafe doesn\'t accept PayPal or Venmo either. Payment happens on a LeagueSafe-hosted screen, using a card or bank account.'}
+  ];
+  const flipGrid = document.getElementById('flipGrid');
+  flipItems.forEach(v=>{
+    const card = document.createElement('div');
+    card.className = 'flip-card';
+    card.innerHTML = `<div class="flip-inner">
+        <div class="flip-face flip-front">
+          <div><div class="tag">${v.tag}</div><div class="vname">${v.name}</div></div>
+          <div class="flip-hint">Tap to read →</div>
+        </div>
+        <div class="flip-face flip-back"><p>${v.text}</p></div>
+      </div>`;
+    card.addEventListener('click', ()=>card.classList.toggle('flipped'));
+    flipGrid.appendChild(card);
+  });
+
+  // ---------- Stage/step selector ----------
+  const stages = [
+    {n:'01', name:'Entry fee paid', detail:'The user pays on a LeagueSafe-hosted screen (card or bank). A 3% processing fee applies: $97 of every $100 lands in the Vault, and $3 goes to LeagueSafe as that fee. Paying isn\'t required to enter a contest — users can enter first and pay later.'},
+    {n:'02', name:'Funds held', detail:'Money sits with LeagueSafe, not Splash. The commissioner can see who has paid and when, but nothing gets distributed until the commissioner takes action.'},
+    {n:'03', name:'Commissioner distributes', detail:'The commissioner manually decides who gets paid and how much — payouts are never automatic just because the contest ended. Amounts are set in exact dollars, not percentages.'},
+    {n:'04', name:'Payout finalizes', detail:'If voting is enabled, the payout waits for contest members to approve it. If automatic distribution is on instead, the money is sent immediately with no approval step.'}
+  ];
+  const stageBar = document.getElementById('stageBar');
+  const stageDetail = document.getElementById('stageDetail');
+  function renderStage(active){
+    stageBar.innerHTML = '';
+    stages.forEach((s,i)=>{
+      const el = document.createElement('div');
+      el.className = 'journey-stage' + (i===active ? ' active' : '');
+      el.innerHTML = `<div class="jnum">${s.n}</div><div class="jname">${s.name}</div>`;
+      el.addEventListener('click', ()=>renderStage(i));
+      stageBar.appendChild(el);
+    });
+    stageDetail.innerHTML = stages[active].detail;
+  }
+  renderStage(0);
+
+  // ---------- Bar chart ----------
+  const barItems = [
+    {topic:'Typical real-money contest rake', pct:100, detail:'Real-money contest platforms typically charge around 10% in rake or service fees.'},
+    {topic:'Contest Vault processing fee', pct:30, detail:'The Contest Vault charges a flat 3% processing fee — significantly lower, and none of it goes to Splash.'}
+  ];
+  const barChart = document.getElementById('barChart');
+  barItems.forEach(b=>{
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = `<div class="bar-row-top"><span class="bar-topic">${b.topic}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${b.pct}%"></div></div>
+      <div class="bar-detail">${b.detail}</div>`;
+    row.addEventListener('click', ()=>row.classList.toggle('open'));
+    barChart.appendChild(row);
+  });
+
+  // ---------- Compare table ----------
+  const compareItems = [
+    ['Commissioner collects entry fees manually (Venmo, cash, etc.)', 'LeagueSafe collects payments through a hosted card/bank screen'],
+    ['Standard Self Managed Service Fee applies', 'Service fee waived once the first Vault payment is made'],
+    ['No structured record of who has paid', 'Commissioner sees a full list of payments and timestamps']
+  ];
+  const compareRows = document.getElementById('compareRows');
+  compareItems.forEach(([b,a])=>{
+    const el = document.createElement('div');
+    el.className = 'compare-row';
+    el.innerHTML = `<div class="compare-cell before">${b}</div><div class="compare-arrow">→</div><div class="compare-cell after">${a}</div>`;
+    compareRows.appendChild(el);
+  });
+
+  // ---------- Status table ----------
+  const statusItems = [
+    ['No geolocation restrictions', 'Users in all 50 states and Canada can pay into the Vault.', 'good'],
+    ['International payments', 'Payments from outside the US/Canada aren\'t accepted yet.', 'pending'],
+    ['No KYC to pay', 'Users can submit their entry fee with no KYC step required.', 'good'],
+    ['Dollar-amount payouts only', 'Percentage-based payouts aren\'t supported — commissioners enter exact dollar amounts.', 'good']
+  ];
+  const statusRows = document.getElementById('statusRows');
+  statusItems.forEach(([label,desc,status])=>{
+    const el = document.createElement('div');
+    el.className = 'status-row';
+    const text = status === 'good' ? 'In place' : 'In progress';
+    el.innerHTML = `<div class="status-cell label">${label}</div><div class="status-cell desc">${desc}</div><div class="status-cell"><span class="status-pill ${status}">${text}</span></div>`;
+    statusRows.appendChild(el);
+  });
+
+  // ---------- Generic accordion builder (reused for both accordion instances) ----------
+  function buildAccordion(containerId, items, indent){
+    const container = document.getElementById(containerId);
+    items.forEach(it=>{
+      const item = document.createElement('div');
+      item.className = 'accordion-item';
+      item.innerHTML = `
+        <div class="accordion-head">
+          <div class="ah-left">${it.badge ? `<div class="badge-sm">${it.badge}</div>` : ''}<div class="accordion-title">${it.title}</div></div>
+          <div class="accordion-arrow">⌄</div>
+        </div>
+        <div class="accordion-body"><div class="accordion-body-inner" style="padding-left:${indent}px;">${it.text}</div></div>`;
+      item.querySelector('.accordion-head').addEventListener('click', ()=>item.classList.toggle('open'));
+      container.appendChild(item);
+    });
+  }
+  buildAccordion('listAccordion', [
+    {title:'Splash never touches the money', text:'Funds move from the user, to LeagueSafe, to the recipient. Splash\'s role is the integration, not the custody — funds are never held on Splash.'},
+    {title:'Paying isn\'t mandatory to enter', text:'Users can join a contest and pay later — it\'s up to them, and it\'s not enforced by Splash.'},
+    {title:'Users can pay outside the Vault too', text:'If a user pays their commissioner via Venmo or hands them cash, the commissioner can choose to log that payment into the Vault manually — or manage it separately. Neither is required.'},
+    {title:'Payment deadlines aren\'t enforced', text:'The "payment deadline" concept exists, but Splash doesn\'t enforce it. It\'s on the commissioner to decide whether to wait or remove a user who hasn\'t paid.'},
+    {title:'Disabling the Vault brings the fee back', text:'If a commissioner turns the Contest Vault off, they go back to being charged the standard Self Managed Service Fee.'},
+    {title:'Disabling repeatedly can lock you out', text:'If a commissioner disables the Vault more than once, they won\'t be able to turn it back on for that contest once someone has made a payment.'},
+    {title:'Rolling out format by format', text:'The Vault is launching first for NFL and college football Pick\'em and Survivor contests. Squares and Shares support is planned for later.'},
+    {title:'Settings lock once the first payment lands', text:'Once a payment has been made into the Vault, the entry fee and approval type can no longer be changed for that contest.'},
+    {title:'Unpaid users get persistent reminders', text:'Entrants who haven\'t paid see a reminder on both the contest details page and their "My Entries" page until they do.'}
+  ], 16);
+  buildAccordion('secondAccordion', [
+    {badge:'1', title:'No vote deadline, on purpose', text:'There\'s no time limit on how long a vote can take. It could resolve in a day, or take a week — nothing gets distributed until the vote actually finalizes.'},
+    {badge:'2', title:'If nobody votes', text:'The commissioner can send vote reminder emails to nudge people along. If a vote truly stalls, CS Support may need to reach out to LeagueSafe to figure out next steps — Splash can\'t cancel a vote or force one through.'},
+    {badge:'3', title:'Survivor: defaults to commissioner-managed', text:'Survivor contests tend to be bigger, and as users get eliminated over time, getting enough people to vote gets harder. To avoid payouts stalling out, Survivor formats default to the commissioner choosing payouts directly instead of a vote.'},
+    {badge:'4', title:'Pick\'em: can default to vote-based', text:'Pick\'em contests are typically smaller and easier to get full participation from, so a vote-based approval can stay the default.'},
+    {badge:'!', title:'A few pieces are still being finalized', text:'Don\'t treat these as settled yet: whether "majority approval" means 51% or a specific vote count, the design for canceling or cleaning up a stuck vote, and whether LeagueSafe sends its own automated reminder emails for pending votes. Check with the team before answering definitively.'},
+    {badge:'5', title:'This section is still filling in', text:'We\'re reviewing the recording of the walkthrough now. Notes from that session will be added here to round out anything currently missing.'}
+  ], 42);
+
+  // ---------- FAQ highlights (Part 4) ----------
+  buildAccordion('faqCommAcc', [
+    {title:'How do I turn on the Contest Vault?', text:'Enter your entry fee, choose an approval type (vote or automatic), a vote type if applicable (majority or unanimous), a payment deadline, and whether there\'s a late fee.'},
+    {title:'What does the Vault cost me as commissioner?', text:'Nothing — enabling it actually waives your standard Self Managed Service Fee, once at least one payment lands in the Vault.'},
+    {title:'Can I turn it off later if I change my mind?', text:'Yes, but the service fee comes back, and disabling it more than once locks you out of re-enabling it for that contest once someone has paid.'},
+    {title:'Can I change my entry fee or approval type after someone pays?', text:'No — once a payment lands in the Vault, those settings lock in for that contest.'},
+    {title:'Can Splash turn the Vault on or off for me?', text:'No — not even Splash admins can do that on your behalf. Only the commissioner can toggle it.'}
+  ], 16);
+  buildAccordion('faqEntAcc', [
+    {title:'How do I pay my entry fee?', text:'On a LeagueSafe-hosted screen with a card or bank account — no Splash wallet, PayPal, or Venmo.'},
+    {title:'Do I need to verify my identity to pay?', text:'No — there\'s no KYC requirement to submit your entry fee.'},
+    {title:'Do I need to verify my identity to get paid out?', text:'Yes — KYC is required before you can withdraw any funds.'},
+    {title:'Will I automatically get paid when the contest ends?', text:'No — your commissioner has to manually submit the payout, and it may also need a vote to approve, depending on their settings.'},
+    {title:'Can Splash step in if I think a payout was unfair?', text:'No — Splash can\'t force, correct, or reverse a payout decision. That\'s worked out within the league.'}
+  ], 16);
+  const roster = [
+    {code:'CM', role:'Commissioner', short:'Sets up and fully controls the Vault.',
+      full:'Configures the entry fee, payout deadline, late fee, approval type (vote or automatic), and vote type (majority or unanimous). Manually decides who gets paid and how much — payouts are never automatic. Can log outside payments (Venmo, cash) into the Vault on a user\'s behalf, and can remove non-paying users from the contest. Once a payment lands in the Vault, the entry fee and approval type lock in and can\'t be changed.'},
+    {code:'US', role:'User (Entrant)', short:'Pays the entry fee and votes on payouts.',
+      full:'Pays via a LeagueSafe-hosted screen with a card or bank account — no Splash wallet balance allowed. No KYC required to pay, but KYC is required to withdraw. Can withdraw straight to a bank account or transfer into their Splash wallet. Not required to pay through the Vault at all.'},
+    {code:'LS', role:'LeagueSafe', short:'Holds every dollar in the Vault.',
+      full:'Owns the payment screen, the KYC process for withdrawals, and custody of the funds themselves. Splash has a direct integration but never holds or touches the money. LeagueSafe is also contractually responsible for support and disputes tied to the Vault — Splash\'s job is forwarding the request, not resolving it.'},
+    {code:'CS', role:'CS Support', short:'Steps in when a vote stalls.',
+      full:'If a vote never finalizes — nobody votes, or it drags on — CS Support may need to loop in LeagueSafe. Splash admins do have a read-only view into a contest\'s Vault settings and payout status (similar to an impersonation view), but can\'t enable, disable, or otherwise manage the Vault on a commissioner\'s behalf.'}
+  ];
+  const rosterGrid = document.getElementById('rosterGrid');
+  roster.forEach(r=>{
+    const el = document.createElement('div');
+    el.className = 'expand-card';
+    el.innerHTML = `
+      <div class="expand-card-top">
+        <div><div class="badge">${r.code}</div><p class="expand-name">${r.role}</p></div>
+        <span class="expand-arrow">⌄</span>
+      </div>
+      <p class="expand-teaser">${r.short}</p>
+      <div class="expand-full"><div class="expand-full-inner">${r.full}</div></div>`;
+    el.addEventListener('click', ()=>el.classList.toggle('open'));
+    rosterGrid.appendChild(el);
+  });
+
+  // ---------- Segmented selector ----------
+  const selectorOptions = [
+    {label:'Vote — Majority', result:'The default. Everyone in the contest must approve a payout by majority vote before the money moves. There\'s no time limit — the vote just has to finalize.'},
+    {label:'Vote — Unanimous', result:'Every single contest member has to approve. Slower to finalize, especially in bigger contests, but nothing pays out until everyone agrees.'},
+    {label:'Automatic', result:'The commissioner decides who gets paid and the money goes out immediately — no votes, no approvals. This also means a commissioner could pay whoever they want, and Splash can\'t correct it.'}
+  ];
+  const selectorButtons = document.getElementById('selectorButtons');
+  const selectorResult = document.getElementById('selectorResult');
+  function renderSelector(active){
+    selectorButtons.innerHTML = '';
+    selectorOptions.forEach((o,i)=>{
+      const b = document.createElement('button');
+      b.className = 'selector-btn' + (i===active?' active':'');
+      b.textContent = o.label;
+      b.addEventListener('click', ()=>renderSelector(i));
+      selectorButtons.appendChild(b);
+    });
+    selectorResult.innerHTML = selectorOptions[active].result;
+  }
+  renderSelector(0);
+
+  // ---------- Resource list ----------
+  const resources = [
+    {title:'Contest Vault — Product Notes', url:'#', desc:'The source doc this guide is built from: what the Vault is, fees, user and commissioner rules, and the enable/configure flow.'}
+  ];
+  const resourceList = document.getElementById('resourceList');
+  resources.forEach(r=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<a href="${r.url}" target="_blank" rel="noopener">${r.title} ↗</a><p>${r.desc}</p>`;
+    resourceList.appendChild(li);
+  });
+</script>
+
+</body>
+</html>
